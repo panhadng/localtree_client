@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 :root {
+  --localtree-green: #185659;
+  --localtree-orange: #ed8c15;
+  --localtree-light-green: #1e6a6e;
+  --localtree-dark-green: #0f3d40;
+  --localtree-light-orange: #f39c2b;
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -8,6 +13,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-localtree-green: var(--localtree-green);
+  --color-localtree-orange: var(--localtree-orange);
+  --color-localtree-light-green: var(--localtree-light-green);
+  --color-localtree-dark-green: var(--localtree-dark-green);
+  --color-localtree-light-orange: var(--localtree-light-orange);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -22,5 +32,23 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--localtree-green);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--localtree-light-green);
 }
