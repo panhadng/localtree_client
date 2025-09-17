@@ -175,7 +175,7 @@ export default function WriteReviewPage({ params }: { params: { id: string } }) 
                 <li>• Be honest and constructive in your feedback</li>
                 <li>• Focus on your personal experience</li>
                 <li>• Avoid personal attacks or offensive language</li>
-                <li>• Don't include personal information</li>
+                <li>• Don&apos;t include personal information</li>
                 <li>• Reviews should be based on actual visits</li>
               </ul>
             </div>
