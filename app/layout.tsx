@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   description:
     "Find, review, and rate local businesses in your community. Connect with local businesses and become a social influencer.",
   keywords: "local business, reviews, ratings, community, local directory",
+  icons: {
+    icon: '/images/logo_2.png',
+    shortcut: '/images/logo_2.png',
+    apple: '/images/logo_2.png',
+  },
 };
 
 export default function RootLayout({

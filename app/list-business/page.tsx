@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { CategoryService } from "../services/categoryService";
 
 export default function ListBusinessPage() {
   const [formData, setFormData] = useState({
@@ -30,10 +31,20 @@ export default function ListBusinessPage() {
 
   const [photos, setPhotos] = useState<File[]>([]);
 
-  const categories = [
-    "Restaurant", "Shopping", "Services", "Health", "Entertainment", 
-    "Automotive", "Beauty", "Education", "Real Estate", "Professional Services"
-  ];
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoryData = await CategoryService.getCategoriesForForms();
+        setCategories(categoryData);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

@@ -1,61 +1,76 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-// Mock data - in a real app, this would come from your database
-const mockBusinesses = [
-  {
-    id: 1,
-    name: "Green Leaf Cafe",
-    category: "Restaurant",
-    rating: 4.8,
-    reviewCount: 124,
-    image: "/images/logo.png",
-    address: "123 Main St, Downtown",
-    description: "Organic coffee and fresh pastries in a cozy atmosphere",
-    tags: ["Coffee", "Organic", "Breakfast"],
-    isVerified: true
-  },
-  {
-    id: 2,
-    name: "Tech Repair Pro",
-    category: "Services",
-    rating: 4.6,
-    reviewCount: 89,
-    image: "/images/logo.png",
-    address: "456 Oak Ave, Tech District",
-    description: "Professional electronics repair with same-day service",
-    tags: ["Electronics", "Repair", "Tech"],
-    isVerified: true
-  },
-  {
-    id: 3,
-    name: "Bella's Boutique",
-    category: "Shopping",
-    rating: 4.9,
-    reviewCount: 156,
-    image: "/images/logo.png",
-    address: "789 Fashion Blvd, Shopping Center",
-    description: "Trendy clothing and accessories for the modern woman",
-    tags: ["Fashion", "Women's Clothing", "Accessories"],
-    isVerified: false
-  },
-  {
-    id: 4,
-    name: "Mountain View Fitness",
-    category: "Health",
-    rating: 4.7,
-    reviewCount: 203,
-    image: "/images/logo.png",
-    address: "321 Fitness Way, Health Plaza",
-    description: "State-of-the-art gym with personal training services",
-    tags: ["Fitness", "Gym", "Personal Training"],
-    isVerified: true
-  }
-];
-
-const categories = ["All", "Restaurant", "Services", "Shopping", "Health", "Entertainment", "Automotive"];
+import { Business, Category } from "../types";
+import { BusinessService } from "../services/businessService";
+import { CategoryService } from "../services/categoryService";
 
 export default function BusinessesPage() {
+  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [businessData, categoryData] = await Promise.all([
+          BusinessService.getBusinesses(),
+          CategoryService.getAllCategories()
+        ]);
+        setBusinesses(businessData);
+        setCategories(categoryData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchFilteredBusinesses = async () => {
+      try {
+        const filteredBusinesses = await BusinessService.getBusinesses({
+          category: selectedCategory,
+          search: searchQuery
+        });
+        setBusinesses(filteredBusinesses);
+      } catch (error) {
+        console.error("Error filtering businesses:", error);
+      }
+    };
+
+    if (!loading) {
+      fetchFilteredBusinesses();
+    }
+  }, [selectedCategory, searchQuery, loading]);
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#185659] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading businesses...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -74,6 +89,8 @@ export default function BusinessesPage() {
               <input
                 type="text"
                 placeholder="Search businesses, services, or products..."
+                value={searchQuery}
+                onChange={handleSearchChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#185659] focus:border-transparent text-gray-700"
               />
             </div>
@@ -93,14 +110,15 @@ export default function BusinessesPage() {
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <button
-                key={category}
+                key={category.id}
+                onClick={() => handleCategoryChange(category.name)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  category === "All" 
+                  selectedCategory === category.name 
                     ? "bg-[#185659] text-white" 
                     : "bg-gray-100 text-gray-700 hover:bg-[#ed8c15] hover:text-white"
                 }`}
               >
-                {category}
+                {category.name}
               </button>
             ))}
           </div>
@@ -109,13 +127,13 @@ export default function BusinessesPage() {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-gray-600">
-            Showing <span className="font-semibold text-[#185659]">{mockBusinesses.length}</span> businesses
+            Showing <span className="font-semibold text-[#185659]">{businesses.length}</span> businesses
           </p>
         </div>
 
         {/* Business Listings */}
         <div className="grid gap-6">
-          {mockBusinesses.map((business) => (
+          {businesses.map((business) => (
             <div key={business.id} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
               <div className="p-6">
                 <div className="flex flex-col md:flex-row gap-6">

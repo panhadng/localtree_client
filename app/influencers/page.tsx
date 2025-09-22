@@ -1,43 +1,42 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-const topInfluencers = [
-  {
-    id: 1,
-    name: "Sarah Chen",
-    avatar: "/images/logo.png",
-    location: "Downtown District",
-    followers: "2.3K",
-    reviews: 156,
-    specialties: ["Restaurants", "Coffee Shops", "Nightlife"],
-    rating: 4.9,
-    badge: "Top Reviewer"
-  },
-  {
-    id: 2,
-    name: "Mike Rodriguez",
-    avatar: "/images/logo.png",
-    location: "Tech Quarter",
-    followers: "1.8K",
-    reviews: 134,
-    specialties: ["Tech Services", "Coworking", "Lunch Spots"],
-    rating: 4.8,
-    badge: "Local Expert"
-  },
-  {
-    id: 3,
-    name: "Emma Thompson",
-    avatar: "/images/logo.png",
-    location: "Arts District",
-    followers: "3.1K",
-    reviews: 203,
-    specialties: ["Shopping", "Beauty", "Entertainment"],
-    rating: 4.9,
-    badge: "Style Guru"
-  }
-];
+import { Influencer } from "../types";
+import { InfluencerService } from "../services/influencerService";
 
 export default function InfluencersPage() {
+  const [topInfluencers, setTopInfluencers] = useState<Influencer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInfluencers = async () => {
+      try {
+        setLoading(true);
+        const influencersData = await InfluencerService.getTopInfluencers();
+        setTopInfluencers(influencersData);
+      } catch (error) {
+        console.error("Error fetching influencers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInfluencers();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#185659] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading influencers...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}

@@ -1,70 +1,71 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-// Mock data - in a real app, this would come from your database
-const mockBusiness = {
-  id: 1,
-  name: "Green Leaf Cafe",
-  category: "Restaurant",
-  rating: 4.8,
-  reviewCount: 124,
-  images: ["/images/logo.png", "/images/logo.png", "/images/logo.png"],
-  address: "123 Main St, Downtown",
-  phone: "(555) 123-4567",
-  website: "www.greenleafcafe.com",
-  hours: {
-    "Monday": "7:00 AM - 8:00 PM",
-    "Tuesday": "7:00 AM - 8:00 PM",
-    "Wednesday": "7:00 AM - 8:00 PM",
-    "Thursday": "7:00 AM - 8:00 PM",
-    "Friday": "7:00 AM - 9:00 PM",
-    "Saturday": "8:00 AM - 9:00 PM",
-    "Sunday": "8:00 AM - 7:00 PM"
-  },
-  description: "Green Leaf Cafe is your neighborhood's premier destination for organic coffee, fresh pastries, and healthy meals. We source our beans directly from sustainable farms and bake everything fresh daily. Our cozy atmosphere makes it perfect for work, meetings, or just relaxing with friends.",
-  amenities: ["Free WiFi", "Outdoor Seating", "Wheelchair Accessible", "Pet Friendly", "Parking Available"],
-  tags: ["Coffee", "Organic", "Breakfast", "Lunch", "Vegan Options"],
-  isVerified: true,
-  owner: "Sarah Johnson"
-};
-
-const mockReviews = [
-  {
-    id: 1,
-    user: "Mike Chen",
-    userAvatar: "/images/logo.png",
-    rating: 5,
-    date: "2024-01-15",
-    title: "Amazing coffee and atmosphere!",
-    content: "I've been coming here for months and it never disappoints. The coffee is exceptional, and the staff is always friendly. The avocado toast is my go-to breakfast!",
-    helpful: 12,
-    isInfluencer: true
-  },
-  {
-    id: 2,
-    user: "Jessica Rodriguez",
-    userAvatar: "/images/logo.png",
-    rating: 4,
-    date: "2024-01-10",
-    title: "Great place for remote work",
-    content: "Perfect spot for getting work done. Good WiFi, comfortable seating, and not too noisy. The pastries are delicious too!",
-    helpful: 8,
-    isInfluencer: false
-  },
-  {
-    id: 3,
-    user: "David Kim",
-    userAvatar: "/images/logo.png",
-    rating: 5,
-    date: "2024-01-05",
-    title: "Best organic coffee in town",
-    content: "As someone who takes coffee seriously, I can say this place knows what they're doing. The single-origin options are fantastic.",
-    helpful: 15,
-    isInfluencer: true
-  }
-];
+import { Business, Review } from "../../types";
+import { BusinessService } from "../../services/businessService";
+import { ReviewService } from "../../services/reviewService";
 
 export default function BusinessProfilePage({ params }: { params: { id: string } }) {
+  const [business, setBusiness] = useState<Business | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [similarBusinesses, setSimilarBusinesses] = useState<Business[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBusinessData = async () => {
+      try {
+        setLoading(true);
+        const businessId = parseInt(params.id);
+        
+        const [businessData, reviewsData, similarData] = await Promise.all([
+          BusinessService.getBusinessById(businessId),
+          ReviewService.getReviewsByBusinessId(businessId),
+          BusinessService.getSimilarBusinesses(businessId)
+        ]);
+
+        setBusiness(businessData);
+        setReviews(reviewsData);
+        setSimilarBusinesses(similarData);
+      } catch (error) {
+        console.error("Error fetching business data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBusinessData();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#185659] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading business details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!business) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Business Not Found</h1>
+          <p className="text-gray-600 mb-4">The business you&apos;re looking for doesn&apos;t exist.</p>
+          <Link 
+            href="/businesses" 
+            className="bg-[#185659] text-white px-4 py-2 rounded-lg hover:bg-[#1e6a6e] transition-colors"
+          >
+            Back to Businesses
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -98,18 +99,18 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
             <div className="lg:w-1/2">
               <div className="grid grid-cols-1 gap-4">
                 <Image
-                  src={mockBusiness.images[0]}
-                  alt={mockBusiness.name}
+                  src={business.images?.[0] || business.image}
+                  alt={business.name}
                   width={600}
                   height={400}
                   className="w-full h-64 object-cover rounded-lg"
                 />
                 <div className="grid grid-cols-2 gap-4">
-                  {mockBusiness.images.slice(1).map((image, index) => (
+                  {business.images?.slice(1).map((image, index) => (
                     <Image
                       key={index}
                       src={image}
-                      alt={`${mockBusiness.name} ${index + 2}`}
+                      alt={`${business.name} ${index + 2}`}
                       width={300}
                       height={200}
                       className="w-full h-32 object-cover rounded-lg"
@@ -122,15 +123,15 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
             {/* Business Info */}
             <div className="lg:w-1/2">
               <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-3xl font-bold text-[#185659]">{mockBusiness.name}</h1>
-                {mockBusiness.isVerified && (
+                <h1 className="text-3xl font-bold text-[#185659]">{business.name}</h1>
+                {business.isVerified && (
                   <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
                     Verified
                   </span>
                 )}
               </div>
               
-              <p className="text-gray-600 mb-4">{mockBusiness.category}</p>
+              <p className="text-gray-600 mb-4">{business.category}</p>
 
               {/* Rating */}
               <div className="flex items-center gap-4 mb-6">
@@ -142,8 +143,8 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
                       </svg>
                     ))}
                   </div>
-                  <span className="text-xl font-semibold text-gray-900">{mockBusiness.rating}</span>
-                  <span className="text-gray-500">({mockBusiness.reviewCount} reviews)</span>
+                  <span className="text-xl font-semibold text-gray-900">{business.rating}</span>
+                  <span className="text-gray-500">({business.reviewCount} reviews)</span>
                 </div>
               </div>
 
@@ -154,27 +155,27 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="text-gray-700">{mockBusiness.address}</span>
+                  <span className="text-gray-700">{business.address}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <span className="text-gray-700">{mockBusiness.phone}</span>
+                  <span className="text-gray-700">{business.phone}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
                   </svg>
-                  <a href={`https://${mockBusiness.website}`} className="text-[#185659] hover:underline">
-                    {mockBusiness.website}
+                  <a href={`https://${business.website}`} className="text-[#185659] hover:underline">
+                    {business.website}
                   </a>
                 </div>
               </div>
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-6">
-                {mockBusiness.tags.map((tag) => (
+                {business.tags.map((tag) => (
                   <span key={tag} className="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">
                     {tag}
                   </span>
@@ -203,14 +204,14 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
             {/* About */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-2xl font-bold text-[#185659] mb-4">About</h2>
-              <p className="text-gray-700 leading-relaxed">{mockBusiness.description}</p>
+              <p className="text-gray-700 leading-relaxed">{business.description}</p>
             </div>
 
             {/* Amenities */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-2xl font-bold text-[#185659] mb-4">Amenities</h2>
               <div className="grid grid-cols-2 gap-3">
-                {mockBusiness.amenities.map((amenity) => (
+                {business.amenities?.map((amenity) => (
                   <div key={amenity} className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -224,7 +225,7 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
             {/* Reviews */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-[#185659]">Reviews ({mockReviews.length})</h2>
+                <h2 className="text-2xl font-bold text-[#185659]">Reviews ({reviews.length})</h2>
                 <Link 
                   href={`/businesses/${params.id}/review`}
                   className="bg-[#ed8c15] text-white px-4 py-2 rounded-lg hover:bg-[#f39c2b] transition-colors"
@@ -234,7 +235,7 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
               </div>
 
               <div className="space-y-6">
-                {mockReviews.map((review) => (
+                {reviews.map((review) => (
                   <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
                     <div className="flex items-start gap-4">
                       <Image
@@ -291,7 +292,7 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-xl font-bold text-[#185659] mb-4">Hours</h3>
               <div className="space-y-2">
-                {Object.entries(mockBusiness.hours).map(([day, hours]) => (
+                {Object.entries(business.hours || {}).map(([day, hours]) => (
                   <div key={day} className="flex justify-between">
                     <span className="text-gray-700">{day}</span>
                     <span className="text-gray-900">{hours}</span>
@@ -306,27 +307,31 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
               <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center">
                 <span className="text-gray-500">Map Coming Soon</span>
               </div>
-              <p className="text-sm text-gray-600 mt-2">{mockBusiness.address}</p>
+              <p className="text-sm text-gray-600 mt-2">{business.address}</p>
             </div>
 
             {/* Similar Businesses */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-xl font-bold text-[#185659] mb-4">Similar Businesses</h3>
               <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3">
+                {similarBusinesses.map((similarBusiness) => (
+                  <Link 
+                    key={similarBusiness.id} 
+                    href={`/businesses/${similarBusiness.id}`}
+                    className="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  >
                     <Image
-                      src="/images/logo.png"
-                      alt="Similar business"
+                      src={similarBusiness.image}
+                      alt={similarBusiness.name}
                       width={40}
                       height={40}
                       className="w-10 h-10 rounded object-cover"
                     />
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900">Similar Cafe {i}</h4>
-                      <p className="text-xs text-gray-500">4.5 ★ (89 reviews)</p>
+                      <h4 className="text-sm font-semibold text-gray-900">{similarBusiness.name}</h4>
+                      <p className="text-xs text-gray-500">{similarBusiness.rating} ★ ({similarBusiness.reviewCount} reviews)</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
