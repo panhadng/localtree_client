@@ -298,7 +298,7 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ id: 
                 <div className="space-y-3">
                   <div className="relative h-48 rounded-lg overflow-hidden">
                     <iframe
-                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${business.latitude},${business.longitude}&zoom=15`}
+                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAXal-PxQwL3YjKJoveOB25FRlN42b3sIs&q=${business.latitude},${business.longitude}&zoom=15`}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
@@ -319,7 +319,7 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ id: 
                       Get Directions
                     </a>
                     <a
-                      href={`https://www.google.com/maps/place/?q=place_id:ChIJN1t_tDeuEmsRUsoyG83frY4`}
+                      href={`https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"

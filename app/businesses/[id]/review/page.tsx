@@ -4,7 +4,11 @@ import { useState, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function WriteReviewPage({ params }: { params: Promise<{ id: string }> }) {
+export default function WriteReviewPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const resolvedParams = use(params);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -29,15 +33,23 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <Link href={`/businesses/${resolvedParams.id}`} className="text-gray-700 hover:text-[#185659]">
+        <Link
+          href={`/businesses/${resolvedParams.id}`}
+          className="text-gray-700 hover:text-[#185659]"
+        >
           ← Back to Business
         </Link>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-3xl font-bold text-[#185659] mb-2">Write a Review</h1>
-          <p className="text-gray-600 mb-8">Share your experience to help others discover great local businesses.</p>
+          <h1 className="text-3xl font-bold text-[#185659] mb-2">
+            Write a Review
+          </h1>
+          <p className="text-gray-600 mb-8">
+            Share your experience to help others discover great local
+            businesses.
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Rating */}
@@ -55,27 +67,27 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
                     onMouseLeave={() => setHoveredRating(0)}
                     onClick={() => setRating(star)}
                   >
-                    <svg 
+                    <svg
                       className={`w-8 h-8 ${
-                        star <= (hoveredRating || rating) 
-                          ? 'text-[#ed8c15] fill-current' 
-                          : 'text-gray-300'
-                      } transition-colors`} 
+                        star <= (hoveredRating || rating)
+                          ? "text-[#ed8c15] fill-current"
+                          : "text-gray-300"
+                      } transition-colors`}
                       viewBox="0 0 20 20"
                     >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                     </svg>
                   </button>
                 ))}
                 <span className="ml-2 text-gray-600">
                   {rating > 0 && (
                     <>
-                      {rating} star{rating !== 1 ? 's' : ''} - 
-                      {rating === 1 && ' Poor'}
-                      {rating === 2 && ' Fair'}
-                      {rating === 3 && ' Good'}
-                      {rating === 4 && ' Very Good'}
-                      {rating === 5 && ' Excellent'}
+                      {rating} star{rating !== 1 ? "s" : ""} -
+                      {rating === 1 && " Poor"}
+                      {rating === 2 && " Fair"}
+                      {rating === 3 && " Good"}
+                      {rating === 4 && " Very Good"}
+                      {rating === 5 && " Excellent"}
                     </>
                   )}
                 </span>
@@ -84,7 +96,10 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
 
             {/* Review Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Review Title *
               </label>
               <input
@@ -100,7 +115,10 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
 
             {/* Review Text */}
             <div>
-              <label htmlFor="review" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="review"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Your Review *
               </label>
               <textarea
@@ -110,7 +128,7 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
                 placeholder="Tell others about your experience. What did you like? What could be improved?"
                 rows={6}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#185659] focus:border-transparent resize-none text-gray-700"
-                required  
+                required
               />
               <p className="text-sm text-gray-500 mt-1">
                 Minimum 50 characters ({review.length}/50)
@@ -132,19 +150,36 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
                   id="photo-upload"
                 />
                 <label htmlFor="photo-upload" className="cursor-pointer">
-                  <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <svg
+                    className="w-12 h-12 text-gray-400 mx-auto mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
                   </svg>
                   <p className="text-gray-600">Click to upload photos</p>
-                  <p className="text-sm text-gray-400">PNG, JPG up to 10MB each</p>
+                  <p className="text-sm text-gray-400">
+                    PNG, JPG up to 10MB each
+                  </p>
                 </label>
               </div>
               {photos.length > 0 && (
                 <div className="mt-4">
-                  <p className="text-sm text-gray-600 mb-2">{photos.length} photo(s) selected</p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {photos.length} photo(s) selected
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {photos.map((photo, index) => (
-                      <span key={index} className="bg-[#185659] text-white px-3 py-1 rounded-full text-sm">
+                      <span
+                        key={index}
+                        className="bg-[#185659] text-white px-3 py-1 rounded-full text-sm"
+                      >
                         {photo.name}
                       </span>
                     ))}
@@ -155,7 +190,9 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
 
             {/* Guidelines */}
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Review Guidelines</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Review Guidelines
+              </h3>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Be honest and constructive in your feedback</li>
                 <li>• Focus on your personal experience</li>
