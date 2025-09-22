@@ -70,17 +70,11 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ id: 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/businesses" className="text-gray-700 hover:text-[#185659]">
-                ← Back to Businesses
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <Link href="/businesses" className="text-gray-700 hover:text-[#185659]">
+          ← Back to Businesses
+        </Link>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Business Header */}
@@ -158,8 +152,13 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ id: 
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
                   </svg>
-                  <a href={`https://${business.website}`} className="text-[#185659] hover:underline">
-                    {business.website}
+                  <a 
+                    href={business.website?.startsWith('http') ? business.website : `https://${business.website}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#185659] hover:underline"
+                  >
+                    {business.website?.replace(/^https?:\/\//, '')}
                   </a>
                 </div>
               </div>
@@ -292,13 +291,48 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ id: 
               </div>
             </div>
 
-            {/* Map Placeholder */}
+            {/* Map */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-xl font-bold text-[#185659] mb-4">Location</h3>
-              <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center">
-                <span className="text-gray-500">Map Coming Soon</span>
-              </div>
-              <p className="text-sm text-gray-600 mt-2">{business.address}</p>
+              {business.latitude && business.longitude ? (
+                <div className="space-y-3">
+                  <div className="relative h-48 rounded-lg overflow-hidden">
+                    <iframe
+                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${business.latitude},${business.longitude}&zoom=15`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      className="absolute inset-0"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-600">{business.address}</p>
+                  <div className="flex gap-2">
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm bg-[#185659] text-white px-3 py-2 rounded-lg hover:bg-[#1e6a6e] transition-colors"
+                    >
+                      Get Directions
+                    </a>
+                    <a
+                      href={`https://www.google.com/maps/place/?q=place_id:ChIJN1t_tDeuEmsRUsoyG83frY4`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      View on Google Maps
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-500">Location data not available</span>
+                </div>
+              )}
             </div>
 
             {/* Similar Businesses */}

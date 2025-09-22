@@ -28,27 +28,11 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/images/logo.png"
-                alt="LocalTree Logo"
-                width={40}
-                height={40}
-                className="mr-3"
-              />
-              <span className="text-2xl font-bold text-[#185659]">LocalTree</span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <Link href={`/businesses/${resolvedParams.id}`} className="text-gray-700 hover:text-[#185659]">
-                ← Back to Business
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <Link href={`/businesses/${resolvedParams.id}`} className="text-gray-700 hover:text-[#185659]">
+          ← Back to Business
+        </Link>
+      </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm p-8">
@@ -109,7 +93,7 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Summarize your experience in a few words"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#185659] focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#185659] focus:border-transparent text-gray-700"
                 required
               />
             </div>
@@ -125,8 +109,8 @@ export default function WriteReviewPage({ params }: { params: Promise<{ id: stri
                 onChange={(e) => setReview(e.target.value)}
                 placeholder="Tell others about your experience. What did you like? What could be improved?"
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#185659] focus:border-transparent resize-none"
-                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#185659] focus:border-transparent resize-none text-gray-700"
+                required  
               />
               <p className="text-sm text-gray-500 mt-1">
                 Minimum 50 characters ({review.length}/50)

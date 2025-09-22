@@ -15,9 +15,13 @@ export interface Business {
   description: string;
   tags: string[];
   isVerified: boolean;
+  isSponsored?: boolean;
+  sponsorshipLevel?: 'premium' | 'standard' | 'basic';
   owner?: string;
   amenities?: string[];
   hours?: BusinessHours;
+  latitude?: number;
+  longitude?: number;
   createdAt?: string;
   updatedAt?: string;
 }

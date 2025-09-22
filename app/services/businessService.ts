@@ -126,6 +126,23 @@ export class BusinessService {
       .slice(0, limit);
   }
 
+  // Get sponsored businesses
+  static async getSponsoredBusinesses(limit: number = 3): Promise<Business[]> {
+    await delay(200);
+    
+    return mockBusinesses
+      .filter(business => business.isSponsored)
+      .sort((a, b) => {
+        // Sort by sponsorship level: premium > standard > basic
+        const levelOrder = { premium: 3, standard: 2, basic: 1 };
+        const aLevel = levelOrder[a.sponsorshipLevel || 'basic'];
+        const bLevel = levelOrder[b.sponsorshipLevel || 'basic'];
+        if (bLevel !== aLevel) return bLevel - aLevel;
+        return b.rating - a.rating; // Then by rating
+      })
+      .slice(0, limit);
+  }
+
   // Search businesses
   static async searchBusinesses(query: string): Promise<Business[]> {
     return this.getBusinesses({ search: query });
