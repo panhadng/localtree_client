@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function WriteReviewPage({ params }: { params: { id: string } }) {
+export default function WriteReviewPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [title, setTitle] = useState("");
@@ -41,7 +42,7 @@ export default function WriteReviewPage({ params }: { params: { id: string } }) 
               <span className="text-2xl font-bold text-[#185659]">LocalTree</span>
             </Link>
             <div className="flex items-center space-x-4">
-              <Link href={`/businesses/${params.id}`} className="text-gray-700 hover:text-[#185659]">
+              <Link href={`/businesses/${resolvedParams.id}`} className="text-gray-700 hover:text-[#185659]">
                 ← Back to Business
               </Link>
             </div>
@@ -190,7 +191,7 @@ export default function WriteReviewPage({ params }: { params: { id: string } }) 
                 Submit Review
               </button>
               <Link
-                href={`/businesses/${params.id}`}
+                href={`/businesses/${resolvedParams.id}`}
                 className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancel

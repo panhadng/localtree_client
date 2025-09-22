@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Business, Review } from "../../types";
 import { BusinessService } from "../../services/businessService";
 import { ReviewService } from "../../services/reviewService";
 
-export default function BusinessProfilePage({ params }: { params: { id: string } }) {
+export default function BusinessProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const [business, setBusiness] = useState<Business | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [similarBusinesses, setSimilarBusinesses] = useState<Business[]>([]);
@@ -17,7 +18,7 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
     const fetchBusinessData = async () => {
       try {
         setLoading(true);
-        const businessId = parseInt(params.id);
+        const businessId = parseInt(resolvedParams.id);
         
         const [businessData, reviewsData, similarData] = await Promise.all([
           BusinessService.getBusinessById(businessId),
@@ -36,7 +37,7 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
     };
 
     fetchBusinessData();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   if (loading) {
     return (
@@ -72,16 +73,6 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
       <header className="bg-white shadow-sm border-b border-gray-100">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/images/logo.png"
-                alt="LocalTree Logo"
-                width={40}
-                height={40}
-                className="mr-3"
-              />
-              <span className="text-2xl font-bold text-[#185659]">LocalTree</span>
-            </Link>
             <div className="flex items-center space-x-4">
               <Link href="/businesses" className="text-gray-700 hover:text-[#185659]">
                 ← Back to Businesses
@@ -185,7 +176,7 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
               {/* Action Buttons */}
               <div className="flex gap-3">
                 <Link 
-                  href={`/businesses/${params.id}/review`}
+                  href={`/businesses/${resolvedParams.id}/review`}
                   className="bg-[#ed8c15] text-white px-6 py-3 rounded-lg hover:bg-[#f39c2b] transition-colors"
                 >
                   Write a Review
@@ -227,7 +218,7 @@ export default function BusinessProfilePage({ params }: { params: { id: string }
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-[#185659]">Reviews ({reviews.length})</h2>
                 <Link 
-                  href={`/businesses/${params.id}/review`}
+                  href={`/businesses/${resolvedParams.id}/review`}
                   className="bg-[#ed8c15] text-white px-4 py-2 rounded-lg hover:bg-[#f39c2b] transition-colors"
                 >
                   Write Review
